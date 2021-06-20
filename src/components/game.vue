@@ -3,21 +3,28 @@
         <!--eslint-disable-->
         <maping></maping>
         <chessing></chessing>
-        <button @click="restart">重新开始</button>
-
+        <websocket1 :path="websocket2" :msg-state="msg"></websocket1>
     </div>
 </template>
 
 <script>
     import Maping from "./game/maping";
     import Chessing from "./game/chessing";
+    import Websocket1 from "./game/websocket1";
     export default {
         name: "game",
         components:{
+            Websocket1,
             Chessing,
             Maping
         },
+        data(){
+            return {
+
+            }
+        },
         mounted() {
+            new WebSocket(`http://localhost:8080`)
             this.$https.post(`/game/start`);
         },
         methods:{
