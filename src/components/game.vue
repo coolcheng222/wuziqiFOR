@@ -3,7 +3,7 @@
         <!--eslint-disable-->
         <maping></maping>
         <chessing></chessing>
-        <websocket1 :path="websocket2" :msg-state="msg"></websocket1>
+        <websocket1 :path="`room/1/12312`"></websocket1>
     </div>
 </template>
 
@@ -14,6 +14,8 @@
     export default {
         name: "game",
         components:{
+            //eslint-disable
+            // eslint-disable-next-line vue/no-unused-components
             Websocket1,
             Chessing,
             Maping
@@ -24,7 +26,6 @@
             }
         },
         mounted() {
-            new WebSocket(`http://localhost:8080`)
             this.$https.post(`/game/start`);
         },
         methods:{
