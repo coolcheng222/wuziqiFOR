@@ -6,12 +6,14 @@ const routes = [
   {
     path:'/game',
     // alias: '/',
-    component: game
+    component: game,
+    name: 'game'
   },
   {
     path:'/login',
     alias:'/',
-    component: login
+    component: login,
+    name: 'login'
   }
 ]
 
