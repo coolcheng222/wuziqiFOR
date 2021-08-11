@@ -13,6 +13,7 @@
             <template v-else>
                 用户: {{other}}
             </template>
+            <button @click="getRoomInfo"></button>
         </div>
         <div class="user me">
             用户(您): {{me}}
@@ -23,34 +24,75 @@
 <script>
     import Maping from "./game/maping";
     import Chessing from "./game/chessing";
-    import Websocket1 from "./game/websocket1";
     import {mapState} from 'vuex';
     export default {
         name: "game",
         components:{
             //eslint-disable
             // eslint-disable-next-line vue/no-unused-components
-            Websocket1,
             Chessing,
             Maping
         },
         data(){
             return {
-                other: ''
+                other: '',
+                token: '',
+                info:{
+                    mePrepared: false,
+                    other: '',
+                    otherPrepared: false,
+                    gaming: false
+                }
             }
         },
-        mounted() {
-            console.log(this.$ws.isConnected());
+        async mounted() {
+            if(!(this.me && this.rid)){
+                try{
+                    let data = await this.$https.get('game/check');
+                    this.$store.commit('enRoom',{rid: this.rid,uid:data.extend});
+                }catch(e){
+                    alert(e)
+                    this.$router.push({name:'login'})
+                    return;
+                }
+            }
+            this.createWebSocket();
         },
         methods:{
+            createWebSocket(){
+                this.$ws.getWs(this.rid,this.me,(msg)=>{
+                    let parse = JSON.parse(msg.data);
+                    console.log(parse)
+                    if(parse.message === "token"){
+                        this.token = parse.extend
+                    }
+                });
+                // eslint-disable-next-line no-constant-condition
+            },
+            async getRoomInfo(){
+                try{
+                    let data = await this.$https.get(`/game/check`,{
+                        headers:{token: this.token}
+                    })
+                    Object.assign(this.info,data.extend);
+                }catch(e){
+                    alert(e);
+                }
+
+            }
         },
         computed:{
             ...mapState({
-                me: state=> state.room.uid
+                me: state=> state.room.uid,
+                rid: state => state.room.rid
             }),
             uids(){
                 return [this.me,this.other];
             }
+        },
+        beforeRouteLeave(){
+            this.$store.commit('deRoom');
+            this.$ws.close1();
         }
 
     }
