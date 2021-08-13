@@ -10,8 +10,8 @@ module.exports = {
     hotOnly: false, //是否开启热更新
     proxy: {
       '/api': {
-        // target: 'http://localhost:8080/server_war', //API服务器的地址
-        target: 'http://45.32.89.193:8082/', //API服务器的地址
+        target: 'http://localhost:8082/', //API服务器的地址
+        // target: 'http://45.32.89.193:8082/', //API服务器的地址
         ws: false,  //代理websockets
         changeOrigin: true, // 虚拟的站点需要更管origin
         pathRewrite: {   //重写路径 比如'/api/aaa/ccc'重写为'/aaa/ccc'

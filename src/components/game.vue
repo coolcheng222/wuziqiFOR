@@ -7,11 +7,11 @@
     </div>
     <div class="room">
         <div class="user other">
-            <template v-if="other === ''">
+            <template v-if="!info.other">
                 等待用户
             </template>
             <template v-else>
-                用户: {{other}}
+                用户: {{info.other}}
             </template>
             <button @click="getRoomInfo"></button>
         </div>
@@ -35,7 +35,6 @@
         },
         data(){
             return {
-                other: '',
                 token: '',
                 info:{
                     mePrepared: false,
@@ -91,6 +90,7 @@
             }
         },
         beforeRouteLeave(){
+            console.log("leaving")
             this.$store.commit('deRoom');
             this.$ws.close1();
         }
