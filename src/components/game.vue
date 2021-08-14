@@ -48,7 +48,7 @@
             if(!(this.me && this.rid)){
                 try{
                     let data = await this.$https.get('game/check');
-                    this.$store.commit('enRoom',{rid: this.rid,uid:data.extend});
+                    this.$store.commit('enRoom',{rid: data.extend.rid,uid:data.extend.me});
                 }catch(e){
                     alert(e)
                     this.$router.push({name:'login'})
@@ -91,6 +91,7 @@
         },
         beforeRouteLeave(){
             console.log("leaving")
+            this.$https.delete(`/room`);
             this.$store.commit('deRoom');
             this.$ws.close1();
         }
