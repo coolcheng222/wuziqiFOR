@@ -1,4 +1,8 @@
 <template>
+    <div class="rinfo">
+        <div>房间ID:{{rid}} <span class="exit" @click="exiting">退出房间</span></div>
+    </div>
+
     <div class="board">
         <!--eslint-disable-->
         <maping></maping>
@@ -11,12 +15,17 @@
                 等待用户
             </template>
             <template v-else>
-                用户: {{info.other}}
+                <span class="other name">用户: {{info.other}}</span>
+                <template v-if="!info.gaming">
+                    <div class="o-prepared">{{preparing}}</div>
+                </template>
             </template>
-            <button @click="getRoomInfo"></button>
         </div>
         <div class="user me">
-            用户(您): {{me}}
+            <div class="me name">用户(您): {{me}}</div>
+            <div @click="prepare" :class="{prepared: info.mePrepared}" class="m-prepared">
+                {{mPreparing}}
+            </div>
         </div>
     </div>
 </template>
@@ -64,6 +73,7 @@
                     console.log(parse)
                     if(parse.message === "token"){
                         this.token = parse.extend
+                        this.getRoomInfo();
                     }
                 });
                 // eslint-disable-next-line no-constant-condition
@@ -78,6 +88,23 @@
                     alert(e);
                 }
 
+            },
+            async exiting(){
+                if(confirm('确认退出?')){
+                    this.$https.delete('/room');
+                    this.$router.push({name:'login'});
+                }
+            },
+            async prepare(){
+                this.info.mePrepared = !this.info.mePrepared;
+                try{
+                    await this.$https.post(`/game/prepare`);
+                }catch(e){
+                    alert('准备失败,多半网络问题');
+                    this.info.mePrepared = !this.info.mePrepared;
+                    console.log(e)
+                }
+
             }
         },
         computed:{
@@ -87,6 +114,22 @@
             }),
             uids(){
                 return [this.me,this.other];
+            },
+            preparing(){
+                if(this.info.otherPrepared){
+                    return '已准备';
+                }else if(this.info.otherPrepared === false){
+                    return '未准备';
+                }else{
+                    return undefined;
+                }
+            },
+            mPreparing(){
+                if(this.info.mePrepared){
+                    return '取消准备';
+                }else{
+                    return '准备';
+                }
             }
         },
         beforeRouteLeave(){
@@ -119,10 +162,56 @@
     }
     .user{
         display: inline-block;
-        line-height: 200px;
         text-align: center;
         width: 200px;
         height: 200px;
+        padding-top: 40px;
     }
+    .name{
+        display: inline-block;
+        height: 30px;
+
+    }
+    .m-prepared{
+        background-color: blueviolet;
+        color: white;
+        padding: 5px;
+        border-radius: 4px;
+        width: 20%;
+        display: block;
+        margin: 0 auto;
+        cursor: pointer;
+        user-select: none;
+    }
+    .m-prepared:hover{
+        background-color: #84bfff;
+    }
+    .m-prepared:active{
+        background-color: #e4eab7;
+    }
+    .m-prepared.prepared{
+        width: 40%;
+        background-color: #d9d5d5;
+        color: #323030;
+    }
+    .m-prepared.prepared:hover{
+        color: #000000;
+        background-color: rgba(255, 236, 230, 0.9);
+    }
+    .m-prepared.prepared:active{
+        background-color: #fff;
+        color: #908c8c;
+    }
+    .exit{
+        display: inline-block;
+        margin-left: 20px;
+        cursor: pointer;
+        color: blue;
+    }
+    .exit:hover{
+        color: cornflowerblue;
+        text-decoration: underline;
+    }
+
 
 </style>
